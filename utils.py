@@ -87,7 +87,7 @@ class Meter:
         self.epoch = epoch
         self.size = 256
         self.save_folder = os.path.join(save_folder, "logs")
-        self.base_threshold = 0.7
+        self.base_threshold = 0.5
         self.base_dice_scores = []
         self.dice_neg_scores = []
         self.dice_pos_scores = []
@@ -108,10 +108,11 @@ class Meter:
         iou = compute_iou_batch(preds, targets, classes=[1])
         self.iou_scores.append(iou)
 
-        if self.phase == "val": # [10]
+        #if self.phase == "val": # [10]
+        if 0:
             for prob, targ in zip(probs,targets):
-                prob = cv2.resize(prob[0].numpy(), (self.size, self.size))
-                targ = cv2.resize(targ[0].numpy(), (self.size, self.size))
+                #prob = cv2.resize(prob[0].numpy(), (self.size, self.size))
+                #targ = cv2.resize(targ[0].numpy(), (self.size, self.size))
                 self.probabilities.append(prob)
                 self.targets.append(targ)
 
@@ -131,6 +132,7 @@ class Meter:
         return self.best_threshold
 
     def get_best_dice(self):
+        return 0
         best_preds = predict(self.probabilities, self.best_threshold)
         best_dice = compute_dice(best_preds, self.targets)
         return best_dice
@@ -223,7 +225,19 @@ def collate_fn(batch):
     #targets is a tuple of dicts
     return images, targets
 
-
+def commit(model_name):
+    import subprocess
+    cmd1 = 'git add .'
+    cmd2 = f'git commit -m "{model_name}"'
+    process = subprocess.Popen(cmd1.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    print(output)
+    if error:
+        print(error)
+    process = subprocess.Popen(cmd2.split(), stdout=subprocess.PIPE)
+    output, error = process.communicate()
+    if error:
+        print(error)
 
 """Footnotes:
 

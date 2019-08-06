@@ -44,23 +44,23 @@ class Trainer(object):
         ext_text = "test"
         self.num_samples = None  # 5000
         self.folder = f"weights/{date}_{self.model_name}_f{self.fold}_{ext_text}"
-        self.resume = True
+        self.resume = False
         self.pretrained = False
         self.pretrained_path = "weights//ckpt31.pth"
         self.resume_path = "weights/48_UNet_f1_ft1024/ckpt38.pth"
         #self.resume_path = os.path.join(HOME, self.folder, "ckpt.pth")
         self.train_df_name = "train.csv"
         self.num_workers = 12
-        self.batch_size = {"train": 4, "val": 2}
+        self.batch_size = {"train": 8, "val": 4}
         self.accumulation_steps = 32 // self.batch_size['train']
-        self.num_classes = 1
+        self.num_classes = 4
         self.top_lr = 5e-5
         self.ep2unfreeze = 0 # doesn't matter, will look into smp
         self.num_epochs = 50
         # self.base_lr = self.top_lr * 0.001
         self.base_lr = None
         self.momentum = 0.95
-        self.size = 1024
+        self.size = None
         self.mean = (0.485, 0.456, 0.406)
         self.std = (0.229, 0.224, 0.225)
         #self.mean = (0, 0, 0)
@@ -83,8 +83,8 @@ class Trainer(object):
         torch.set_default_tensor_type(self.tensor_type)
         self.net = get_model(self.model_name, self.num_classes)
         #self.criterion = torch.nn.BCELoss() # requires sigmoid pred inputs
-        #self.criterion = torch.nn.BCEWithLogitsLoss()
-        self.criterion = MixedLoss(10.0, 2.0)
+        self.criterion = torch.nn.BCEWithLogitsLoss()
+        #self.criterion = MixedLoss(10.0, 2.0)
         #self.criterion = criterion
         #self.criterion = DiceLoss()
         self.optimizer = optim.Adam(self.net.parameters(), lr=self.top_lr)
@@ -243,10 +243,11 @@ class Trainer(object):
                 self.ckpt_path, os.path.join(
                     self.save_folder, "ckpt%d.pth" % epoch)
             )
-            #print_time(self.log, t_epoch_start, "Time taken by the epoch")
             print_time(self.log, t0, "Total time taken so far")
             print('\n\n')
-            #self.log("\n" + "=" * 60 + "\n")
+            if epoch==0 and len(self.dataloaders['train']) > 100:
+                # make sure train/val ran error free, and it's not debugging
+                commit(self.model_name)
 
 
 if __name__ == "__main__":

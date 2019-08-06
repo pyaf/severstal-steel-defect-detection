@@ -1,0 +1,16 @@
+01:36:11 Starting epoch: 0 | phase: train 
+01:39:11 Starting epoch: 0 | phase: train 
+13:43:57 Starting epoch: 0 | phase: train 
+13:56:35 lr: 0.000050 | IoU: 0.0896
+13:56:35 dice: 0.0745 | dice_neg: 0.0030 | dice_pos: 0.1393
+13:56:35 Starting epoch: 0 | phase: val 
+13:58:17 Starting epoch: 0 | phase: train 
+14:00:02 Starting epoch: 0 | phase: train 
+14:12:29 lr: 0.000050 | IoU: 0.1071
+14:12:29 dice: 0.0843 | dice_neg: 0.0000 | dice_pos: 0.1606
+14:12:29 Starting epoch: 0 | phase: val 
+14:14:49 best_dice: 0.0000
+14:14:49 lr: 0.000050 | IoU: 0.2072
+14:14:49 dice: 0.1509 | dice_neg: 0.0000 | dice_pos: 0.2690
+14:14:49 ******** New optimal found, saving state ********
+14:14:50 Total time taken so far: 14:47

@@ -15,12 +15,31 @@ from sklearn.model_selection import train_test_split, StratifiedKFold
 #from utils import to_multi_label
 from albumentations import *
 from albumentations import torch as AT
+from torchvision.transforms import ToTensor
 from mask_functions import *
 
 
 HOME = os.path.abspath(os.path.dirname(__file__))
 
-class SIIMDataset(Dataset):
+def make_mask(row_id, df):
+    fname = df.iloc[row_id].name
+    labels = df.iloc[row_id][:4]
+    masks = np.zeros((256, 1600, 4), dtype=np.float32) # float32 is V.Imp
+    # 4:class 1～4 (ch:0～3)
+
+    for idx, label in enumerate(labels.values):
+        if label is not np.nan:
+            label = label.split(" ")
+            positions = map(int, label[0::2])
+            length = map(int, label[1::2])
+            mask = np.zeros(256 * 1600, dtype=np.uint8)
+            for pos, le in zip(positions, length):
+                mask[pos:(pos + le)] = 1 #idx+1
+            masks[:, :, idx] = mask.reshape(256, 1600, order='F')
+            #masks += mask.reshape(256, 1600, order='F')
+    return fname, masks
+
+class SteelDataset(Dataset):
     def __init__(self, df, data_folder, size, mean, std, phase):
         self.df = df
         self.root = data_folder
@@ -29,28 +48,26 @@ class SIIMDataset(Dataset):
         self.std = std
         self.phase = phase
         self.transforms, self.img_trfms = get_transforms(phase, size, mean, std)
+        self.totensor = ToTensor()
 
-        self.fnames = self.df['ImageId'].tolist()
-        self.labels = self.df['has_mask'].values.astype(np.int32) # [12]
+        self.fnames = self.df.index.tolist()
+        #self.labels = self.df['has_mask'].values.astype(np.int32) # [12]
 
     def __getitem__(self, idx):
-        image_id = self.fnames[idx]
-
-        image_path = os.path.join(self.root, "npy_train_1024",  image_id + '.npy')
-        mask_path = os.path.join(self.root, "npy_masks_1024", image_id + '.npy')
-        img = np.load(image_path)
-        img = np.repeat(img, 3, axis=-1)
-        mask = np.load(mask_path)
-
+        image_id, mask = make_mask(idx, self.df)
+        image_path = os.path.join(self.root, "train_images",  image_id)
+        img = cv2.imread(image_path)
         #if self.phase == "train":
         #    img = self.img_trfms(image=img)['image'] # only for RGB
+        #print('f', mask.shape)
         augmented = self.transforms(image=img, mask=mask)
-        img = augmented['image']# / 255.0
-        mask = augmented['mask']
-        #img = torch.Tensor(img)
-        #mask = torch.Tensor(mask)
+        img = augmented['image']
+        mask = augmented['mask'] # 1x256x1600x4
+        mask = mask[0].permute(2, 0, 1) # 1x4x256x1600
+
         target = {}
-        target["labels"] = self.labels[idx]
+
+        #target["labels"] = self.labels[idx]
         target["image_id"] = image_id
         target["masks"] = mask
         return img, target
@@ -69,13 +86,13 @@ def get_transforms(phase, size, mean, std):
                 #Transpose(p=0.5),
                 #Flip(p=0.5),
                 HorizontalFlip(),
-                ShiftScaleRotate(
-                    shift_limit=0,  # no resizing
-                    scale_limit=0.1,
-                    rotate_limit=10,
-                    p=0.5,
-                    border_mode=cv2.BORDER_CONSTANT
-                ),
+                #ShiftScaleRotate(
+                #    shift_limit=0,  # no resizing
+                #    scale_limit=0.1,
+                #    rotate_limit=10,
+                #    p=0.5,
+                #    border_mode=cv2.BORDER_CONSTANT
+                #),
             ]
         )
         img_trfms = Compose([
@@ -127,20 +144,17 @@ def provider(
     num_samples=4000,
 ):
     df = pd.read_csv(df_path)
-    df = df.drop_duplicates('ImageId')
-    df_with_mask = df.query('has_mask == 1')
-    #df = df_with_mask.copy()
-    df_without_mask = df.query('has_mask==0')
-    df_wom_sampled = df_without_mask.sample(len(df_with_mask))
-    df = pd.concat([df_with_mask, df_wom_sampled])
-    print(df.shape)
+    df['ImageId'], df['ClassId'] = zip(*df['ImageId_ClassId'].str.split('_'))
+    df['ClassId'] = df['ClassId'].astype(int)
+    df = df.pivot(index='ImageId',columns='ClassId',values='EncodedPixels')
+    df['defects'] = df.count(axis=1)
+    #print(df.head())
     kfold = StratifiedKFold(total_folds, shuffle=True, random_state=69)
     train_idx, val_idx = list(kfold.split(
-        df["ImageId"], df["has_mask"]))[fold]
+        df.index, df["defects"]))[fold]
     train_df, val_df = df.iloc[train_idx], df.iloc[val_idx]
     df = train_df if phase == "train" else val_df
-    #print(df.shape)
-    image_dataset = SIIMDataset(df, images_folder, size, mean, std, phase)
+    image_dataset = SteelDataset(df, images_folder, size, mean, std, phase)
     #datasampler = get_sampler(df, [1, 1])
     datasampler = None
     dataloader = DataLoader(
@@ -167,19 +181,15 @@ if __name__ == "__main__":
     total_folds = 5
     mean = (0.485, 0.456, 0.406)
     std = (0.229, 0.224, 0.225)
-    #mean = (0.5, 0.5, 0.5)
-    #std = (0.5, 0.5, 0.5)
 
     size = 512
 
     root = os.path.dirname(__file__)  # data folder
     data_folder = "data"
-    train_df_name = 'train.csv'
+    df_path = 'data/train.csv'
     num_samples = None  # 5000
     class_weights = True  # [1, 1, 1, 1, 1]
-    batch_size = 16
-    #images_folder = os.path.join(root, data_folder, "train_png/")  #
-    df_path = os.path.join(root, data_folder, train_df_name)  #
+    batch_size = 4
 
     dataloader = provider(
         fold,
@@ -202,16 +212,12 @@ if __name__ == "__main__":
     for idx, batch in enumerate(dataloader):
         images, targets = batch
         masks = targets['masks']
-        labels = targets['labels']
         pdb.set_trace()
         for fname in targets['image_id']:
             fnames_dict[fname] += 1
-
-        print("%d/%d" % (idx, total_len), images.shape, masks.shape, labels.shape)
-        total_labels.extend(labels.tolist())
+        print("%d/%d" % (idx, total_len), images.shape, masks.shape)
     #pdb.set_trace()
 
-    print('Unique label count:', np.unique(total_labels, return_counts=True))
     diff = time.time() - start
     print('Time taken: %02d:%02d' % (diff//60, diff % 60))
     print('fnames unique count:', np.unique(list(fnames_dict.values()), return_counts=True))
