@@ -3,9 +3,8 @@ from .pretrained import *
 
 
 
-def get_model(model_name, num_classes):
+def get_model(model_name, encoder_name, num_classes):
     if model_name == "UNet":
-        return UNet()
-        #return UNet(num_channels, num_classes)
+        return UNet(encoder=encoder_name, classes=num_classes)
 
 

@@ -10,6 +10,15 @@ Dataloader on npy files is very slow: 11 minutes for one loop.
 with make_mask, cv2.imread: 1:25 :)
 with make_mask, np.load image: 3:17
 
+`68_UNet_f1_test`: org image training, with resnet34 arch unet, lr=5e-5
+LB: 0.88
+
+# 8 Aug
+
+`88_se_resnext_101x4d_unet`: same as above with se_resnext_101x4d encoder, with 1e-4
+batch size 4, 2, grad acc = 32, 30 min for train epoch *.*
+
+
 
 
 

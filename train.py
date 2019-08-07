@@ -37,13 +37,14 @@ class Trainer(object):
     def __init__(self):
         # remark = open("remark.txt", "r").read()
         remark = ""
-        self.fold = 1
+        self.fold = 0
         self.total_folds = 5
         self.class_weights = None #[1, 1, 1, 1, 1.3]
         self.model_name = "UNet"
-        ext_text = "test"
+        self.encoder = "se_resnext101_32x4d"
+        ext_text = "unet"
         self.num_samples = None  # 5000
-        self.folder = f"weights/{date}_{self.model_name}_f{self.fold}_{ext_text}"
+        self.folder = f"weights/{date}_{self.encoder}_f{self.fold}_{ext_text}"
         self.resume = False
         self.pretrained = False
         self.pretrained_path = "weights//ckpt31.pth"
@@ -51,10 +52,10 @@ class Trainer(object):
         #self.resume_path = os.path.join(HOME, self.folder, "ckpt.pth")
         self.train_df_name = "train.csv"
         self.num_workers = 12
-        self.batch_size = {"train": 8, "val": 4}
+        self.batch_size = {"train": 4, "val": 2}
         self.accumulation_steps = 32 // self.batch_size['train']
         self.num_classes = 4
-        self.top_lr = 5e-5
+        self.top_lr = 1e-4
         self.ep2unfreeze = 0 # doesn't matter, will look into smp
         self.num_epochs = 50
         # self.base_lr = self.top_lr * 0.001
@@ -81,7 +82,7 @@ class Trainer(object):
         self.tensor_type = "torch%s.FloatTensor" % (
             ".cuda" if self.cuda else "")
         torch.set_default_tensor_type(self.tensor_type)
-        self.net = get_model(self.model_name, self.num_classes)
+        self.net = get_model(self.model_name, self.encoder, self.num_classes)
         #self.criterion = torch.nn.BCELoss() # requires sigmoid pred inputs
         self.criterion = torch.nn.BCEWithLogitsLoss()
         #self.criterion = MixedLoss(10.0, 2.0)
