@@ -247,7 +247,7 @@ class Trainer(object):
             print('\n\n')
             if epoch==0 and len(self.dataloaders['train']) > 100:
                 # make sure train/val ran error free, and it's not debugging
-                commit(self.model_name)
+                commit(self.folder.split('/')[1])
 
 
 if __name__ == "__main__":

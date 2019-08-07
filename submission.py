@@ -30,13 +30,13 @@ def get_parser():
     parser = ArgumentParser()
     parser.add_argument("-c", "--ckpt_path",
                         dest="ckpt_path", help="Checkpoint to use")
-    #parser.add_argument(
-    #    "-p",
-    #    "--predict_on",
-    #    dest="predict_on",
-    #    help="predict on train or test set, options: test or train",
-    #    default="resnext101_32x4d",
-    #)
+    parser.add_argument(
+        "-p",
+        "--predict_on",
+        dest="predict_on",
+        help="predict on train or test set, options: test or train",
+        default="resnext101_32x4d",
+    )
     return parser
 
 
@@ -44,7 +44,8 @@ class TestDataset(data.Dataset):
     def __init__(self, root, df, size, mean, std, tta=4):
         self.root = root
         self.size = size
-        self.fnames = list(df["ImageId"])
+        df['ImageId'] = df['ImageId_ClassId'].apply(lambda x: x.split('_')[0])
+        self.fnames = df['ImageId'].unique().tolist()
         self.num_samples = len(self.fnames)
         self.tta = tta
         self.TTA = albumentations.Compose(
@@ -66,14 +67,14 @@ class TestDataset(data.Dataset):
         self.transform = albumentations.Compose(
             [
                 albumentations.Normalize(mean=mean, std=std, p=1),
-                albumentations.Resize(size, size),
+                #albumentations.Resize(size, size),
                 AT.ToTensor(),
             ]
         )
 
     def __getitem__(self, idx):
         fname = self.fnames[idx]
-        path = os.path.join(self.root, fname + ".png")
+        path = os.path.join(self.root, fname)
         image = cv2.imread(path)
 
         images = [self.transform(image=image)["image"]]
@@ -81,7 +82,7 @@ class TestDataset(data.Dataset):
             aug_img = self.TTA(image=image)["image"]
             aug_img = self.transform(image=aug_img)["image"]
             images.append(aug_img)
-        return torch.stack(images, dim=0)
+        return fname, torch.stack(images, dim=0)
 
     def __len__(self):
         return self.num_samples
@@ -95,12 +96,13 @@ def get_model_name_fold(ckpt_path):
     return model_name, int(fold)
 
 
+
 def post_process(probability, threshold, min_size):
 
     mask = cv2.threshold(probability, threshold, 1, cv2.THRESH_BINARY)[1]
     num_component, component = cv2.connectedComponents(mask.astype(np.uint8))
 
-    predictions = np.zeros((1024, 1024), np.float32)
+    predictions = np.zeros((256, 1600), np.float32)
     num = 0
     for c in range(1, num_component):
         p = (component == c)
@@ -110,6 +112,7 @@ def post_process(probability, threshold, min_size):
     return predictions, num
 
 
+
 if __name__ == "__main__":
     """
     uses given ckpt to predict on test data and save sigmoid outputs as npy file.
@@ -117,16 +120,18 @@ if __name__ == "__main__":
     parser = get_parser()
     args = parser.parse_args()
     ckpt_path = args.ckpt_path
-    predict_on = "test"
+    predict_on = args.predict_on
     model_name, fold = get_model_name_fold(ckpt_path)
-
-    sample_submission_path = "data/sample_submission.csv"
+    if predict_on == "test":
+        sample_submission_path = "data/sample_submission.csv"
+    else:
+        sample_submission_path = "data/train.csv"
 
     sub_path = ckpt_path.replace(".pth", f"{predict_on}.csv")
     npy_path = ckpt_path.replace(".pth", f"{predict_on}%d.npy")
     tta = 0  # number of augs in tta
 
-    root = f"data/{predict_on}_png/"
+    root = f"data/{predict_on}_images/"
     size = 1024
     save_npy = False
     save_rle = True
@@ -134,8 +139,7 @@ if __name__ == "__main__":
     mean = (0.485, 0.456, 0.406)
     std = (0.229, 0.224, 0.225)
     use_cuda = True
-    num_classes = 1
-    num_workers = 4
+    num_workers = 2
     batch_size = 4
     device = torch.device("cuda" if use_cuda else "cpu")
     setup(use_cuda)
@@ -148,7 +152,7 @@ if __name__ == "__main__":
         pin_memory=True if use_cuda else False,
     )
 
-    model = get_model(model_name, num_classes)
+    model = get_model(model_name, num_classes=4)
     model.to(device)
     model.eval()
 
@@ -170,28 +174,24 @@ if __name__ == "__main__":
     for i, batch in enumerate(tqdm(testset)):
         if tta:
             # images.shape [n, 3, 96, 96] where n is num of 1+tta
-            for images in batch:
+            for fnames, images in batch:
                 preds = torch.sigmoid(model(images.to(device)))  # [n, num_classes]
                 preds = preds.mean(dim=0).detach().tolist()
                 predictions.append(preds)
         else:
-            #pdb.set_trace()
-            preds = torch.sigmoid(model(batch[:, 0].to(device)))
-            preds = preds.detach().cpu().numpy()[:, 0, :, :]  # [1]
+            fnames, images = batch
+            batch_preds = torch.sigmoid(model(images[:, 0].to(device)))
+            batch_preds = batch_preds.detach().cpu().numpy()
             if save_npy:
-                predictions.extend(preds.tolist())
+                predictions.extend(batch_preds.tolist())
             if save_rle:
-                for probability in preds:
-                    if probability.shape != (1024, 1024):
-                        probability = cv2.resize(probability,
-                                dsize=(1024, 1024), interpolation=cv2.INTER_LINEAR)
-                    predict, num_predict = post_process(probability,
-                            best_threshold, min_size)
-                    if num_predict == 0:
-                        encoded_pixels.append('-1')
-                    else:
-                        r = run_length_encode(predict)
-                        encoded_pixels.append(r)
+                for fname, preds in zip(fnames, batch_preds):
+                    for cls, pred in enumerate(preds):
+                        pred, num = post_process(pred, best_threshold, min_size)
+                        #pdb.set_trace()
+                        rle = mask2rle(pred)
+                        name = fname + f"_{cls+1}"
+                        predictions.append([name, rle])
 
         if save_npy:
             if (i+1) % (num_batches//10) == 0:
@@ -206,6 +206,6 @@ if __name__ == "__main__":
         print("Done!")
 
     if save_rle:
-        df['EncodedPixels'] = encoded_pixels
-        df.to_csv(sub_path, columns=['ImageId', 'EncodedPixels'], index=False)
+        df = pd.DataFrame(predictions, columns=['ImageId_ClassId', 'EncodedPixels'])
+        df.to_csv(sub_path, index=False)
 
