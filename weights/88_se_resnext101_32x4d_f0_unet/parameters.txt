@@ -60,3 +60,65 @@ Parameter Group 0
     weight_decay: 0
 )
 remark: 
+Time: 2019-08-08 11:37:51.059020
+model_name: UNet
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/88_se_resnext101_32x4d_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: None
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 4, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 19
+augmentations: [HorizontalFlip(always_apply=False, p=0.5), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0001
+    weight_decay: 0
+)
+remark: 
+Time: 2019-08-09 00:16:12.209384
+model_name: UNet
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/88_se_resnext101_32x4d_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: None
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 4, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 36
+augmentations: [HorizontalFlip(always_apply=False, p=0.5), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1e-05
+    weight_decay: 0
+)
+remark: 
