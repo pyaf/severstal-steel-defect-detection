@@ -84,8 +84,8 @@ def get_transforms(phase, size, mean, std):
         list_transforms.extend(
             [
                 #Transpose(p=0.5),
-                #Flip(p=0.5),
-                HorizontalFlip(),
+                Flip(p=0.9),
+                #HorizontalFlip(),
                 #ShiftScaleRotate(
                 #    shift_limit=0,  # no resizing
                 #    scale_limit=0.1,
@@ -114,7 +114,7 @@ def get_transforms(phase, size, mean, std):
     list_transforms.extend(
         [
             Normalize(mean=mean, std=std, p=1),
-            #Resize(size, size),
+            Resize(size[0], size[1]),
             AT.ToTensor(),  # [6]
         ]
     )
@@ -182,7 +182,8 @@ if __name__ == "__main__":
     mean = (0.485, 0.456, 0.406)
     std = (0.229, 0.224, 0.225)
 
-    size = 512
+    size = (256, 800)
+    #size = None
 
     root = os.path.dirname(__file__)  # data folder
     data_folder = "data"

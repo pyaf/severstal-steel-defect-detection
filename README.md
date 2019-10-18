@@ -1,18 +1,6 @@
-Image Classification Baseline
+# Severestal Steel Defect Detection Challenge
 
-Dependencies:
 
-    * Pytorch 1.0
-    * pretrainedmodels
-    * pycm
-    * albumentations
-    * torchvision
-    * torchnet
-    * sklearn
-    * pandas
-    * numpy
-    * opencv-python
-    * tensorboard_logger
-    * etc, etc...
-    *
+### 18 Oct
 
+* `1810_efficientnet-b5_f0_unet`: [256, 800]

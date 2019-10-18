@@ -42,7 +42,7 @@ class Trainer(object):
         self.class_weights = None #[1, 1, 1, 1, 1.3]
         self.model_name = "UNet"
         #self.encoder = "se_resnext101_32x4d"
-        self.encoder = "se_resnet101"
+        self.encoder = "efficientnet-b5"
         ext_text = "unet"
         self.num_samples = None  # 5000
         #date = "88"
@@ -63,7 +63,7 @@ class Trainer(object):
         # self.base_lr = self.top_lr * 0.001
         self.base_lr = None
         self.momentum = 0.95
-        self.size = None
+        self.size = [256, 800]
         self.mean = (0.485, 0.456, 0.406)
         self.std = (0.229, 0.224, 0.225)
         #self.mean = (0, 0, 0)
@@ -160,6 +160,17 @@ class Trainer(object):
             if self.start_epoch > 5:
                 # self.base_lr = self.top_lr
                 # print(f"Base lr = Top lr = {self.top_lr}")
+                '''
+
+
+
+
+                make model params trainable
+
+
+
+
+                '''
                 pass
 
         if self.cuda:
@@ -206,9 +217,9 @@ class Trainer(object):
             running_loss += loss.item()
             outputs = outputs.detach().cpu() # [6]
             meter.update(targets['masks'], outputs)
-            tk0.set_postfix(loss=(running_loss / ((itr + 1)))) #[7]
+            tk0.set_postfix(loss=((running_loss * self.accumulation_steps) / (itr + 1))) #[7]
         best_threshold = meter.get_best_threshold()
-        epoch_loss = running_loss / total_batches
+        epoch_loss = (running_loss * self.accumulation_steps) / total_batches
         epoch_log(self.optimizer, self.log, self.tb, phase,
                         epoch, epoch_loss, meter, start)
         torch.cuda.empty_cache()

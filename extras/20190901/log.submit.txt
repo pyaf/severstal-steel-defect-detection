@@ -1,0 +1,124 @@
+ 
+
+--- [START 2019-09-02_00-04-07] ----------------------------------------------------------------
+
+	@common.py:  
+	set random seed
+		SEED = 1567353848
+	set cuda environment
+		torch.__version__              = 1.1.0
+		torch.version.cuda             = 9.0.176
+		torch.backends.cudnn.version() = 7501
+		os['CUDA_VISIBLE_DEVICES']     = 0
+		torch.cuda.device_count()      = 1
+
+
+
+	SEED         = 1567353848
+	PROJECT_PATH = /root/share/project/kaggle/2019/steel/code/dummy_08
+	__file__     = /root/share/project/kaggle/2019/steel/code/dummy_08/efficientb0_unet_plus_v4_1/submit.py
+	out_dir      = /root/share/project/kaggle/2019/steel/result/efficientb0_unet_plus_v4_1
+
+** dataset setting **
+test_dataset : 
+	mode    = train
+	split   = ['valid0_500.npy']
+	csv     = ['train.csv']
+		len   =   500
+		num   =  2000
+		neg   =  1712  0.856
+		pos   =   288  0.144
+		pos1  =    35  0.070  0.122
+		pos2  =     5  0.010  0.017
+		pos3  =   213  0.426  0.740
+		pos4  =    35  0.070  0.122
+
+
+** net setting **
+	initial_checkpoint = /root/share/project/kaggle/2019/steel/result/efficientb0_unet_plus_v4_1/checkpoint/00090000_model.pth
+<class 'model.Net'>
+
+** augment = null **
+
+augment = ['null']
+threshold_pixel = [0.5, 0.5, 0.6, 0.5]
+dice_all     = 0.888336
+dice_neg_all = 0.941005
+dice_pos_all = 0.580981
+dice_neg[1], dice_pos[1], = 0.96559,  0.24306
+dice_neg[2], dice_pos[2], = 0.97172,  0.35461
+dice_neg[3], dice_pos[3], = 0.78049,  0.64374
+dice_neg[4], dice_pos[4], = 0.98280,  0.56931
+
+min_size = [800, 1000, 3000, 3500]
+dice_all     = 0.911766
+dice_neg_all = 0.992407
+dice_pos_all = 0.434070
+dice_neg[1], dice_pos[1], = 1.00000,  0.07365
+dice_neg[2], dice_pos[2], = 0.99798,  0.34172
+dice_neg[3], dice_pos[3], = 0.95819,  0.48428
+dice_neg[4], dice_pos[4], = 1.00000,  0.50213
+
+
+--- [START 2019-09-02_00-05-26] ----------------------------------------------------------------
+
+	@common.py:  
+	set random seed
+		SEED = 1567353926
+	set cuda environment
+		torch.__version__              = 1.1.0
+		torch.version.cuda             = 9.0.176
+		torch.backends.cudnn.version() = 7501
+		os['CUDA_VISIBLE_DEVICES']     = 0
+		torch.cuda.device_count()      = 1
+
+
+
+	SEED         = 1567353926
+	PROJECT_PATH = /root/share/project/kaggle/2019/steel/code/dummy_08
+	__file__     = /root/share/project/kaggle/2019/steel/code/dummy_08/efficientb0_unet_plus_v4_1/submit.py
+	out_dir      = /root/share/project/kaggle/2019/steel/result/efficientb0_unet_plus_v4_1
+
+** dataset setting **
+test_dataset : 
+	mode    = train
+	split   = ['valid0_500.npy']
+	csv     = ['train.csv']
+		len   =   500
+		num   =  2000
+		neg   =  1712  0.856
+		pos   =   288  0.144
+		pos1  =    35  0.070  0.122
+		pos2  =     5  0.010  0.017
+		pos3  =   213  0.426  0.740
+		pos4  =    35  0.070  0.122
+
+
+** net setting **
+	initial_checkpoint = /root/share/project/kaggle/2019/steel/result/efficientb0_unet_plus_v4_1/checkpoint/00090000_model.pth
+<class 'model.Net'>
+
+** augment = null **
+** augment = flip_lr **
+** augment = flip_ud **
+
+augment = ['null', 'flip_lr', 'flip_ud']
+threshold_pixel = [0.5, 0.5, 0.6, 0.5]
+dice_all     = 0.883524
+dice_neg_all = 0.924065
+dice_pos_all = 0.649563
+dice_neg[1], dice_pos[1], = 0.91828,  0.39817
+dice_neg[2], dice_pos[2], = 0.97172,  0.37076
+dice_neg[3], dice_pos[3], = 0.75958,  0.69150
+dice_neg[4], dice_pos[4], = 0.98065,  0.68557
+
+min_size = [800, 1000, 3000, 3500]
+dice_all     = 0.922074
+dice_neg_all = 0.986565
+dice_pos_all = 0.543027
+dice_neg[1], dice_pos[1], = 0.99355,  0.24540
+dice_neg[2], dice_pos[2], = 0.99394,  0.35466
+dice_neg[3], dice_pos[3], = 0.94077,  0.57916
+dice_neg[4], dice_pos[4], = 1.00000,  0.64766
+
+

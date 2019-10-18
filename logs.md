@@ -20,6 +20,9 @@ batch size 4, 2, grad acc = 32, 30 min for train epoch *.*
 
 
 
+## TODO:
+* Augmentations need to be updated.
+* optimize `min_size`
 
 
 OLD kaggle competition:
@@ -29,14 +32,8 @@ install latest of segmentation_models.pytorch
 
 # Questions and Ideas:
 
-# TODO:
-
-* Img size 512 and 1024?
-
 
 # Revelations:
-
-
 
 
 # Things to check, just before starting the model training:

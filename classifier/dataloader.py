@@ -132,12 +132,16 @@ def provider(
     num_samples=4000,
 ):
     df = pd.read_csv(df_path)
-    df = df.drop_duplicates('ImageId')
-    df_with_mask = df.query('has_mask == 1')
+    df['ImageId'], df['ClassId'] = zip(*df['ImageId_ClassId'].str.split('_'))
+    df['ClassId'] = df['ClassId'].astype(int)
+    df = df.pivot(index='ImageId',columns='ClassId',values='EncodedPixels')
+    df['defects'] = df.count(axis=1)
+    #df = df.drop_duplicates('ImageId')
+    #df_with_mask = df.query('has_mask == 1')
     #df = df_with_mask.copy()
-    df_without_mask = df.query('has_mask==0')
-    df_wom_sampled = df_without_mask.sample(len(df_with_mask)+3000)
-    df = pd.concat([df_with_mask, df_wom_sampled])
+    #df_without_mask = df.query('has_mask==0')
+    #df_wom_sampled = df_without_mask.sample(len(df_with_mask)+3000)
+    #df = pd.concat([df_with_mask, df_wom_sampled])
 
     kfold = StratifiedKFold(total_folds, shuffle=True, random_state=69)
     train_idx, val_idx = list(kfold.split(
@@ -178,12 +182,12 @@ if __name__ == "__main__":
 
     root = os.path.dirname(__file__)  # data folder
     data_folder = "../data"
-    train_df_name = 'train.csv'
+    df_name = 'train.csv'
     num_samples = None  # 5000
     class_weights = True  # [1, 1, 1, 1, 1]
     batch_size = 16
     #images_folder = os.path.join(root, data_folder, "train_png/")  #
-    df_path = os.path.join(root, data_folder, train_df_name)  #
+    df_path = os.path.join(root, data_folder, df_name)  #
 
     dataloader = provider(
         fold,
