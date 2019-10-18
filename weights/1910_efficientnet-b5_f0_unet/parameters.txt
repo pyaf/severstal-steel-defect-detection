@@ -1,0 +1,124 @@
+Time: 2019-10-19 01:26:44.951437
+model_name: FPN
+train_df_name: train.csv
+resume: False
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 800]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 4, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 0
+augmentations: [Flip(always_apply=False, p=0.9), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), Resize(always_apply=False, p=1, height=256, width=800, interpolation=1), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0001
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-19 01:27:21.723268
+model_name: FPN
+train_df_name: train.csv
+resume: False
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 800]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 0
+augmentations: [Flip(always_apply=False, p=0.9), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), Resize(always_apply=False, p=1, height=256, width=800, interpolation=1), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0001
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-19 01:27:48.579376
+model_name: FPN
+train_df_name: train.csv
+resume: False
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 800]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 6, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 0
+augmentations: [Flip(always_apply=False, p=0.9), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), Resize(always_apply=False, p=1, height=256, width=800, interpolation=1), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0001
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-19 01:29:36.401170
+model_name: FPN
+train_df_name: train.csv
+resume: False
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 800]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 4, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 0
+augmentations: [Flip(always_apply=False, p=0.9), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), Resize(always_apply=False, p=1, height=256, width=800, interpolation=1), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0001
+    weight_decay: 0
+)
+remark: 

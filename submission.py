@@ -35,7 +35,7 @@ def get_parser():
         "--predict_on",
         dest="predict_on",
         help="predict on train or test set, options: test or train",
-        default="resnext101_32x4d",
+        default="test",
     )
     return parser
 
@@ -67,7 +67,7 @@ class TestDataset(data.Dataset):
         self.transform = albumentations.Compose(
             [
                 albumentations.Normalize(mean=mean, std=std, p=1),
-                #albumentations.Resize(size, size),
+                albumentations.Resize(size[0], size[1]),
                 AT.ToTensor(),
             ]
         )
@@ -89,8 +89,8 @@ class TestDataset(data.Dataset):
 
 
 def get_model_name_fold(ckpt_path):
-    # example ckpt_path = weights/9-7_{modelname}_fold0_text/ckpt12.pth
-    model_folder = ckpt_path.split("/")[1]  # 9-7_{modelname}_fold0_text
+    # example ckpt_path = weights/1810_{modelname}_fold0_text/ckpt12.pth
+    model_folder = ckpt_path.split("/")[1]  # 1810_{modelname}_fold0_text
     model_name = "_".join(model_folder.split("_")[1:-2])  # modelname
     fold = model_folder.split("_")[-2][1:]  # f0 -> 0
     return model_name, int(fold)
@@ -98,7 +98,8 @@ def get_model_name_fold(ckpt_path):
 
 
 def post_process(probability, threshold, min_size):
-
+    if probability.shape != (256, 1600):
+        probability = cv2.resize(probability, (1600, 256)) # w, h
     mask = cv2.threshold(probability, threshold, 1, cv2.THRESH_BINARY)[1]
     num_component, component = cv2.connectedComponents(mask.astype(np.uint8))
 
@@ -132,15 +133,15 @@ if __name__ == "__main__":
     tta = 0  # number of augs in tta
 
     root = f"data/{predict_on}_images/"
-    size = 1024
+    size = [256, 800]
     save_npy = False
     save_rle = True
-    min_size = 3500
+    min_size = 2000
     mean = (0.485, 0.456, 0.406)
     std = (0.229, 0.224, 0.225)
     use_cuda = True
-    num_workers = 2
-    batch_size = 4
+    num_workers = 4
+    batch_size = 2
     device = torch.device("cuda" if use_cuda else "cpu")
     setup(use_cuda)
     df = pd.read_csv(sample_submission_path)
@@ -187,6 +188,7 @@ if __name__ == "__main__":
             if save_rle:
                 for fname, preds in zip(fnames, batch_preds):
                     for cls, pred in enumerate(preds):
+                        #import pdb; pdb.set_trace()
                         pred, num = post_process(pred, best_threshold, min_size)
                         #pdb.set_trace()
                         rle = mask2rle(pred)

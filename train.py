@@ -40,7 +40,7 @@ class Trainer(object):
         self.fold = 0
         self.total_folds = 5
         self.class_weights = None #[1, 1, 1, 1, 1.3]
-        self.model_name = "UNet"
+        self.model_name = "FPN"
         #self.encoder = "se_resnext101_32x4d"
         self.encoder = "efficientnet-b5"
         ext_text = "unet"
@@ -54,7 +54,7 @@ class Trainer(object):
         self.resume_path = os.path.join(HOME, self.folder, "ckpt.pth")
         self.train_df_name = "train.csv"
         self.num_workers = 12
-        self.batch_size = {"train": 4, "val": 2}
+        self.batch_size = {"train": 4, "val": 4}
         self.accumulation_steps = 32 // self.batch_size['train']
         self.num_classes = 4
         self.top_lr = 1e-4
@@ -243,10 +243,12 @@ class Trainer(object):
                 "state_dict": self.net.state_dict(),
                 "optimizer": self.optimizer.state_dict(),
             }
-            val_loss, best_threshold = self.iterate(epoch, "val")
-            state['best_threshold'] = best_threshold
-            torch.save(state, self.ckpt_path)  # [2]
-            self.scheduler.step(val_loss)
+
+            with torch.no_grad():
+                val_loss, best_threshold = self.iterate(epoch, "val")
+                state['best_threshold'] = best_threshold
+                torch.save(state, self.ckpt_path)  # [2]
+                self.scheduler.step(val_loss)
 
             if val_loss < self.best_loss:
                 self.log("******** New optimal found, saving state ********")

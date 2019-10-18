@@ -54,9 +54,15 @@ class SteelDataset(Dataset):
         #self.labels = self.df['has_mask'].values.astype(np.int32) # [12]
 
     def __getitem__(self, idx):
-        image_id, mask = make_mask(idx, self.df)
-        image_path = os.path.join(self.root, "train_images",  image_id)
-        img = cv2.imread(image_path)
+
+        fname = self.df.iloc[idx].name
+        img = np.load(os.path.join(self.root, 'npy_train', fname + '.npy'))
+        img = np.expand_dims(img, -1)
+        img = np.repeat(img, 3, -1)
+        mask = np.load(os.path.join(self.root, 'npy_masks', fname + '.npy'))
+        #image_id, mask = make_mask(idx, self.df)
+        #image_path = os.path.join(self.root, "train_images",  image_id)
+        #img = cv2.imread(image_path)
         #if self.phase == "train":
         #    img = self.img_trfms(image=img)['image'] # only for RGB
         #print('f', mask.shape)
@@ -68,7 +74,7 @@ class SteelDataset(Dataset):
         target = {}
 
         #target["labels"] = self.labels[idx]
-        target["image_id"] = image_id
+        target["image_id"] = fname
         target["masks"] = mask
         return img, target
 
