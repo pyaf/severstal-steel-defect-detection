@@ -1,0 +1,1 @@
+03:06:30 Starting epoch: 0 | phase: train 

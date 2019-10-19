@@ -41,22 +41,24 @@ class Trainer(object):
         ext_text = ""
         self.num_samples = None #5000
         self.folder = f"weights/{date}_{self.model_name}_f{self.fold}_{ext_text}"
-        self.resume = False
+        self.resume = True
         self.pretrained = False
         self.pretrained_path = "weights/18-7_efficientnet-b5_fold0_bgccold/ckpt19.pth"
-        self.resume_path = os.path.join(HOME, self.folder, "ckpt4.pth")
+        self.resume_path = os.path.join(HOME, self.folder, "ckpt.pth")
         self.train_df_name = "train.csv"
         self.data_folder = '../data'
-        self.num_workers = 12
-        self.batch_size = {"train": 16, "val": 8}
-        self.num_classes = 1
-        self.top_lr = 3e-5
+        self.num_workers = 4
+        self.phases = ["train", "val"]
+        self.batch_size = {"train": 2, "val": 2}
+        self.accumulation_steps = {x: 32 // self.batch_size[x] for x in self.phases}
+        self.num_classes = 4
+        self.top_lr = 1e-4
         self.ep2unfreeze = 2
         self.num_epochs = 40
         #self.base_lr = self.top_lr * 0.001
         self.base_lr = None
         self.momentum = 0.95
-        self.size = 256
+        self.size = [256, 800]
         self.mean = (0.485, 0.456, 0.406)
         self.std = (0.229, 0.224, 0.225)
         #self.mean = (0, 0, 0)
@@ -65,7 +67,6 @@ class Trainer(object):
         self.best_acc = 0
         self.best_loss = float("inf")
         self.start_epoch = 0
-        self.phases = ["train", "val"]
         self.cuda = torch.cuda.is_available()
         torch.set_num_threads(12)
         self.device = torch.device("cuda:0" if self.cuda else "cpu")
@@ -74,10 +75,11 @@ class Trainer(object):
         self.save_folder = os.path.join(HOME, self.folder)
         self.model_path = os.path.join(self.save_folder, "model.pth")
         self.ckpt_path = os.path.join(self.save_folder, "ckpt.pth")
-        self.tensor_type = "torch%s.FloatTensor" % (".cuda" if self.cuda else "")
-        torch.set_default_tensor_type(self.tensor_type)
+        #self.tensor_type = "torch%s.FloatTensor" % (".cuda" if self.cuda else "")
+        #torch.set_default_tensor_type(self.tensor_type)
         self.net = get_model(self.model_name, self.num_classes)
         self.criterion = torch.nn.BCEWithLogitsLoss()
+        #self.criterion = torch.nn.CrossEntropyLoss()
         self.optimizer = optim.Adam(
                    self.net.parameters(),
                    lr=self.top_lr,
@@ -145,6 +147,9 @@ class Trainer(object):
                 #self.base_lr = self.top_lr
                 #print(f"Base lr = Top lr = {self.top_lr}")
                 pass
+            if self.start_epoch >= self.ep2unfreeze:
+                for params in self.net.parameters():
+                    params.requires_grad = True
 
         if self.cuda:
             for opt_state in self.optimizer.state.values():
@@ -161,7 +166,7 @@ class Trainer(object):
         images = images.to(self.device)
         #targets = targets.type(torch.LongTensor).to(self.device) # [1]
         targets = targets.type(torch.FloatTensor).to(self.device)
-        targets = targets.view(-1, 1) # [n] -> [n, 1] V. imp for MSELoss
+        #targets = targets.view(-1, 1) # [n] -> [n, 1] V. imp for MSELoss
         outputs = self.net(images)
         loss = self.criterion(outputs, targets)
         return loss, outputs
@@ -175,22 +180,26 @@ class Trainer(object):
         dataloader = self.dataloaders[phase]
         running_loss = 0
         total_batches = len(dataloader)
+        acc_steps = self.accumulation_steps[phase]
         tk0 = tqdm(dataloader, total=total_batches)
-        for iteration, batch in enumerate(tk0):
+        for itr, batch in enumerate(tk0):
             images, targets = batch
             labels = targets['labels']
             fnames = targets['image_id']
             self.optimizer.zero_grad()
             loss, outputs = self.forward(images, labels)
+            loss = loss / acc_steps
             if phase == "train":
                 with amp.scale_loss(loss, self.optimizer) as scaled_loss:
                     scaled_loss.backward()
-                self.optimizer.step()
+            if (itr + 1 ) % acc_steps == 0:
+                    self.optimizer.step()
+                    self.optimizer.zero_grad()
             running_loss += loss.item()
             meter.update(labels, outputs.detach())
-            tk0.set_postfix(loss=(running_loss / ((iteration + 1)))) #[7]
+            tk0.set_postfix(loss=((running_loss * acc_steps) / (itr + 1))) #[7]
         best_thresholds = meter.get_best_thresholds()
-        epoch_loss = running_loss / total_batches
+        epoch_loss = (running_loss * acc_steps) / total_batches
         best_acc = epoch_log(self.log, self.tb, phase, epoch, epoch_loss, meter, start)
         torch.cuda.empty_cache()
         return epoch_loss, best_acc, best_thresholds
@@ -213,10 +222,12 @@ class Trainer(object):
                 "state_dict": self.net.state_dict(),
                 "optimizer": self.optimizer.state_dict(),
             }
-            val_loss, val_acc, best_thresholds = self.iterate(epoch, "val")
-            state["best_thresholds"] = best_thresholds
-            torch.save(state, self.ckpt_path) # [2]
-            self.scheduler.step(val_loss)
+            with torch.no_grad():
+                val_loss, val_acc, best_thresholds = self.iterate(epoch, "val")
+                state["best_thresholds"] = best_thresholds
+                torch.save(state, self.ckpt_path) # [2]
+                self.scheduler.step(val_loss)
+
             if val_loss < self.best_loss:
                 self.log("******** New optimal found, saving state ********")
                 state["best_loss"] = self.best_loss = val_loss

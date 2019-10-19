@@ -59,8 +59,10 @@ class Meter:
         '''targets, outputs are detached CUDA tensors'''
         # get multi-label to single label
         #targets = torch.sum(targets, 1) - 1 # no multilabel target in regression
-        targets = targets.type(torch.LongTensor)
-        outputs = torch.sigmoid(outputs).flatten() # [n, 1] -> [n]
+        targets = targets.type(torch.LongTensor).flatten()
+        #import pdb; pdb.set_trace()
+        outputs = torch.sigmoid(outputs).cpu().numpy() #.flatten() # [n, 1] -> [n]
+        outputs = predict(outputs, self.best_thresholds).flatten()
         # outputs = torch.sum((outputs > 0.5), 1) - 1
 
         #pdb.set_trace()
@@ -83,8 +85,11 @@ class Meter:
             args=(self.predictions, self.targets),
             method="nelder-mead",
         )
-        self.best_thresholds = simplex["x"][0]
-        print("Best thresholds: %s" % self.best_thresholds)
+        best_thresholds = simplex["x"][0]
+        print("Best thresholds: %s" % best_thresholds)
+        '''
+        NOT using best threshold
+        '''
         return self.best_thresholds
 
     def get_cm(self):
@@ -120,8 +125,8 @@ def epoch_log(log, tb, phase, epoch, epoch_loss, meter, start):
     #pdb.set_trace()
     print()
     log(
-        "%s %d |  loss: %0.4f | best_acc: %0.4f | ACC: %0.4f | TPR: %0.4f | PPV: %0.4f \n"
-        % (phase, epoch, epoch_loss, best_acc, acc, tpr, ppv)
+        "%s %d |  loss: %0.4f | ACC: %0.4f | TPR: %0.4f | PPV: %0.4f \n"
+        % (phase, epoch, epoch_loss, acc, tpr, ppv)
     )
     try:
         cls_tpr = {x: "%0.4f" % y for x, y in cls_tpr.items()}

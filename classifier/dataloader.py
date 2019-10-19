@@ -9,6 +9,7 @@ from torchvision import transforms
 from torch.utils.data import DataLoader, Dataset, sampler
 from torchvision.datasets.folder import pil_loader
 from sklearn.model_selection import train_test_split, StratifiedKFold
+from iterstrat.ml_stratifiers import MultilabelStratifiedKFold
 #from utils import *
 import albumentations
 from albumentations import torch as AT
@@ -24,16 +25,18 @@ class SIIMDataset(Dataset):
         self.phase = phase
         self.transforms = get_transforms(phase, size, mean, std)
 
-        self.fnames = self.df['ImageId'].tolist()
-        self.labels = self.df['has_mask'].values.astype(np.int32) # [12]
+        self.fnames = self.df.index.tolist() # names
+        #self.labels = self.df['defects'].values.astype(np.int32) # [12]
+        self.labels = self.df[[1, 2, 3, 4]].values
 
     def __getitem__(self, idx):
         image_id = self.fnames[idx]
 
-        image_path = os.path.join(self.root, "npy_train_256",  image_id + '.npy')
+        image_path = os.path.join(self.root, "npy_train",  image_id + '.npy')
         img = np.load(image_path)
-        img = np.repeat(img, 3, axis=-1)
-        #print(img.shape)
+        img = np.expand_dims(img, -1)
+        img = np.repeat(img, 3, -1)
+
 
         augmented = self.transforms(image=img)#, mask=mask)
         img = augmented['image']# / 255.0
@@ -56,10 +59,10 @@ def get_transforms(phase, size, mean, std):
     if phase == "train":
         list_transforms.extend(
             [
-                albumentations.Rotate(limit=180, p=0.5),
+                #albumentations.Rotate(limit=180, p=0.5),
                 albumentations.Transpose(p=0.5),
                 albumentations.Flip(p=0.5),
-                albumentations.RandomScale(scale_limit=0.1),
+                #albumentations.RandomScale(scale_limit=0.1),
                 albumentations.OneOf(
                     [
                         albumentations.CLAHE(clip_limit=2),
@@ -79,7 +82,7 @@ def get_transforms(phase, size, mean, std):
         [
 
             albumentations.Normalize(mean=mean, std=std, p=1),
-            albumentations.Resize(size, size),
+            albumentations.Resize(size[0], size[1]),
             AT.ToTensor(normalize=None), # [6]
         ]
     )
@@ -136,16 +139,12 @@ def provider(
     df['ClassId'] = df['ClassId'].astype(int)
     df = df.pivot(index='ImageId',columns='ClassId',values='EncodedPixels')
     df['defects'] = df.count(axis=1)
-    #df = df.drop_duplicates('ImageId')
-    #df_with_mask = df.query('has_mask == 1')
-    #df = df_with_mask.copy()
-    #df_without_mask = df.query('has_mask==0')
-    #df_wom_sampled = df_without_mask.sample(len(df_with_mask)+3000)
-    #df = pd.concat([df_with_mask, df_wom_sampled])
-
-    kfold = StratifiedKFold(total_folds, shuffle=True, random_state=69)
-    train_idx, val_idx = list(kfold.split(
-        df["ImageId"], df["has_mask"]))[fold]
+    df['ImageId'] = df.index
+    for idx in range(1, 5):
+        df[idx] = df[idx].apply(lambda x: int(type(x) ==  str))
+    #kfold = StratifiedKFold(total_folds, shuffle=True, random_state=69)
+    kfold = MultilabelStratifiedKFold(n_splits=total_folds, random_state=69)
+    train_idx, val_idx = list(kfold.split(df.index, df[[1, 2, 3, 4]]))[fold]
     train_df, val_df = df.iloc[train_idx], df.iloc[val_idx]
     df = train_df if phase == "train" else val_df
     #print(df.shape)
@@ -178,7 +177,7 @@ if __name__ == "__main__":
     #mean = (0.5, 0.5, 0.5)
     #std = (0.5, 0.5, 0.5)
 
-    size = 256
+    size = [256, 800]
 
     root = os.path.dirname(__file__)  # data folder
     data_folder = "../data"
@@ -230,7 +229,7 @@ Footnotes:
 
 https://github.com/btgraham/SparseConvNet/tree/kaggle_Diabetic_Retinopathy_competition
 
-[1] CrossEntropyLoss doesn't expect inputs to be one-hot, but indices
+[1] CrossEntropyLoss doesn't expect targets to be one-hot, but indices
 [2] .value_counts() returns in descending order of counts (not sorted by class numbers :)
 [3]: bad_indices are those which have conflicting diagnosises, duplicates are those which have same duplicates, we shouldn't let them split in train and val set, gotta maintain the sanctity of val set
 [4]: used when the dataframe include external data and we want to sample limited number of those

@@ -35,7 +35,7 @@ def get_parser():
         "--predict_on",
         dest="predict_on",
         help="predict on train or test set, options: test or train",
-        default="resnext101_32x4d",
+        default="test",
     )
     return parser
 
@@ -52,7 +52,7 @@ class TestDataset(data.Dataset):
                 albumentations.Rotate(limit=180, p=0.5),
                 albumentations.Transpose(p=0.5),
                 albumentations.Flip(p=0.5),
-                albumentations.RandomScale(scale_limit=0.1),
+                #albumentations.RandomScale(scale_limit=0.1),
                 #albumentations.ShiftScaleRotate(
                 #    shift_limit=0,  # no resizing
                 #    scale_limit=0.1,
@@ -77,14 +77,14 @@ class TestDataset(data.Dataset):
         self.transform = albumentations.Compose(
             [
                 albumentations.Normalize(mean=mean, std=std, p=1),
-                albumentations.Resize(size, size),
+                albumentations.Resize(size[0], size[1]),
                 AT.ToTensor(),
             ]
         )
 
     def __getitem__(self, idx):
         fname = self.fnames[idx]
-        path = os.path.join(self.root, fname + ".png")
+        path = os.path.join(self.root, fname)
         image = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
         image = np.expand_dims(image, -1)
         image = np.repeat(image, 3, -1)
@@ -143,22 +143,17 @@ if __name__ == "__main__":
 
     tta = 4 # number of augs in tta
     sub_path = ckpt_path.replace(".pth", f"{predict_on}.csv")
-    root = f"../data/{predict_on}_png/"
-    size = 256
+    root = f"../data/{predict_on}_images/"
+    size = [256, 800]
     mean = (0.485, 0.456, 0.406)
     std = (0.229, 0.224, 0.225)
     #mean = (0, 0, 0)
     #std = (1, 1, 1)
     use_cuda = True
-    num_classes = 1
+    num_classes = 4
     num_workers = 8
-    batch_size = 16
+    batch_size = 8
     device = torch.device("cuda" if use_cuda else "cpu")
-    if use_cuda:
-        cudnn.benchmark = True
-        torch.set_default_tensor_type("torch.cuda.FloatTensor")
-    else:
-        torch.set_default_tensor_type("torch.FloatTensor")
 
     df = pd.read_csv(sample_submission_path)
     testset = DataLoader(
@@ -185,6 +180,7 @@ if __name__ == "__main__":
     preds = get_predictions(model, testset, tta)
     best_thresholds = 0.5
     pred_labels = predict(preds, best_thresholds)
+    pred_labels = (pred_labels.sum(axis=1) > 0).astype('int')
     pdb.set_trace()
     df["label"] = pred_labels
     print(f"Saving predictions at {sub_path}")

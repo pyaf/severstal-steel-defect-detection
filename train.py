@@ -42,7 +42,7 @@ class Trainer(object):
         self.class_weights = None #[1, 1, 1, 1, 1.3]
         self.model_name = "FPN"
         #self.encoder = "se_resnext101_32x4d"
-        self.encoder = "efficientnet-b5"
+        self.encoder = "efficientnet-b3"
         ext_text = "unet"
         self.num_samples = None  # 5000
         #date = "88"
@@ -54,8 +54,9 @@ class Trainer(object):
         self.resume_path = os.path.join(HOME, self.folder, "ckpt.pth")
         self.train_df_name = "train.csv"
         self.num_workers = 12
-        self.batch_size = {"train": 4, "val": 4}
-        self.accumulation_steps = 32 // self.batch_size['train']
+        self.phases = ["train", "val"]
+        self.batch_size = {"train": 8, "val": 4}
+        self.accumulation_steps = {x: 32 // self.batch_size[x] for x in self.phases}
         self.num_classes = 4
         self.top_lr = 1e-4
         self.ep2unfreeze = 0 # doesn't matter, will look into smp
@@ -63,7 +64,7 @@ class Trainer(object):
         # self.base_lr = self.top_lr * 0.001
         self.base_lr = None
         self.momentum = 0.95
-        self.size = [256, 800]
+        self.size = [256, 1600]
         self.mean = (0.485, 0.456, 0.406)
         self.std = (0.229, 0.224, 0.225)
         #self.mean = (0, 0, 0)
@@ -71,7 +72,6 @@ class Trainer(object):
         # self.weight_decay = 5e-4
         self.best_loss = float("inf")
         self.start_epoch = 0
-        self.phases = ["train", "val"]
         self.cuda = torch.cuda.is_available()
         torch.set_num_threads(12)
         self.device = torch.device("cuda:0" if self.cuda else "cpu")
@@ -203,23 +203,24 @@ class Trainer(object):
         total_batches = len(dataloader) # [5]
         tk0 = tqdm(dataloader, total=total_batches)
         self.optimizer.zero_grad()
+        acc_steps = self.accumulation_steps[phase]
         for itr, batch in enumerate(tk0):
             images, targets = batch
             # pdb.set_trace()
             loss, outputs = self.forward(images, targets)
-            loss = loss / self.accumulation_steps
+            loss = loss / acc_steps
             if phase == "train":
                 with amp.scale_loss(loss, self.optimizer) as scaled_loss:
                     scaled_loss.backward()
-                if (itr + 1 ) % self.accumulation_steps == 0:
+                if (itr + 1 ) % acc_steps == 0:
                     self.optimizer.step()
                     self.optimizer.zero_grad()
             running_loss += loss.item()
             outputs = outputs.detach().cpu() # [6]
             meter.update(targets['masks'], outputs)
-            tk0.set_postfix(loss=((running_loss * self.accumulation_steps) / (itr + 1))) #[7]
+            tk0.set_postfix(loss=((running_loss * acc_steps) / (itr + 1))) #[7]
         best_threshold = meter.get_best_threshold()
-        epoch_loss = (running_loss * self.accumulation_steps) / total_batches
+        epoch_loss = (running_loss * acc_steps) / total_batches
         epoch_log(self.optimizer, self.log, self.tb, phase,
                         epoch, epoch_loss, meter, start)
         torch.cuda.empty_cache()
