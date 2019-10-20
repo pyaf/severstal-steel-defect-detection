@@ -14,8 +14,9 @@ from torchvision.datasets.folder import pil_loader
 from sklearn.model_selection import train_test_split, StratifiedKFold
 #from utils import to_multi_label
 from albumentations import *
-from albumentations import torch as AT
-from torchvision.transforms import ToTensor
+#from albumentations import pytorch as AT
+from albumentations.pytorch import ToTensorV2 as ToTensor
+#from torchvision.transforms import ToTensor
 from mask_functions import *
 
 
@@ -68,8 +69,9 @@ class SteelDataset(Dataset):
         #print('f', mask.shape)
         augmented = self.transforms(image=img, mask=mask)
         img = augmented['image']
-        mask = augmented['mask'] # 1x256x1600x4
-        mask = mask[0].permute(2, 0, 1) # 1x4x256x1600
+        mask = augmented['mask'] / 255 # 256x1600x4
+        #print(mask.shape)
+        mask = mask.permute(2, 0, 1) # 4x256x1600
 
         target = {}
 
@@ -121,7 +123,7 @@ def get_transforms(phase, size, mean, std):
         [
             Normalize(mean=mean, std=std, p=1),
             Resize(size[0], size[1]),
-            AT.ToTensor(),  # [6]
+            ToTensor(),  # [6]
         ]
     )
 
@@ -159,7 +161,8 @@ def provider(
     train_idx, val_idx = list(kfold.split(
         df.index, df["defects"]))[fold]
     train_df, val_df = df.iloc[train_idx], df.iloc[val_idx]
-    df = train_df if phase == "train" else val_df
+    #df = train_df if phase == "train" else val_df
+    df = train_df
     image_dataset = SteelDataset(df, images_folder, size, mean, std, phase)
     #datasampler = get_sampler(df, [1, 1])
     datasampler = None

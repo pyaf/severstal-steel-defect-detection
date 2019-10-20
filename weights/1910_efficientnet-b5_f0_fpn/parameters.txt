@@ -1,0 +1,620 @@
+Time: 2019-10-19 01:26:44.951437
+model_name: FPN
+train_df_name: train.csv
+resume: False
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 800]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 4, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 0
+augmentations: [Flip(always_apply=False, p=0.9), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), Resize(always_apply=False, p=1, height=256, width=800, interpolation=1), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0001
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-19 01:27:21.723268
+model_name: FPN
+train_df_name: train.csv
+resume: False
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 800]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 0
+augmentations: [Flip(always_apply=False, p=0.9), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), Resize(always_apply=False, p=1, height=256, width=800, interpolation=1), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0001
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-19 01:27:48.579376
+model_name: FPN
+train_df_name: train.csv
+resume: False
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 800]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 6, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 0
+augmentations: [Flip(always_apply=False, p=0.9), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), Resize(always_apply=False, p=1, height=256, width=800, interpolation=1), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0001
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-19 01:29:36.401170
+model_name: FPN
+train_df_name: train.csv
+resume: False
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_unet
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 800]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 4, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 0
+augmentations: [Flip(always_apply=False, p=0.9), Normalize(always_apply=False, p=1, mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225), max_pixel_value=255.0), Resize(always_apply=False, p=1, height=256, width=800, interpolation=1), ToTensor(always_apply=True, p=1.0, num_classes=1, sigmoid=True, normalize=None)]
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 0.0001
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:00:43.398094
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7efad846e510>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:01:03.177496
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7fe2c4076690>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:01:21.438294
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7f06f02996d0>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:01:58.956077
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7efcdd4f8590>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:04:38.836505
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7f5dcc0e6650>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:04:55.355882
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7f40342b85d0>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:05:34.424830
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7f31b06aa510>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:06:52.830790
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 8, 'val': 4}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7f195973b590>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:07:13.587611
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 2, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7ff04006f4d0>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:10:53.830556
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 2, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7f0e834b55d0>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:11:31.546637
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 2, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7fd7305676d0>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:17:29.050567
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 2, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7fce15638650>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:20:42.981493
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 2, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7fae40085590>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:21:34.102768
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 2, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7fc6b47324d0>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:21:52.094932
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 2, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7f775038e590>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 
+Time: 2019-10-20 15:22:38.889832
+model_name: FPN
+train_df_name: train.csv
+resume: True
+pretrained: False
+pretrained_path: weights//ckpt31.pth
+folder: weights/1910_efficientnet-b5_f0_fpn
+fold: 0
+total_folds: 5
+num_samples: None
+sampling class weights: None
+size: [256, 1600]
+top_lr: 0.0001
+base_lr: None
+num_workers: 12
+batchsize: {'train': 2, 'val': 2}
+momentum: 0.95
+mean: (0.485, 0.456, 0.406)
+std: (0.229, 0.224, 0.225)
+start_epoch: 41
+augmentations: <albumentations.core.composition.Transforms object at 0x7f5c3c0435d0>
+criterion: BCEWithLogitsLoss()
+optimizer: Adam (
+Parameter Group 0
+    amsgrad: False
+    betas: (0.9, 0.999)
+    eps: 1e-08
+    lr: 1.0000000000000004e-08
+    weight_decay: 0
+)
+remark: 

@@ -42,25 +42,26 @@ class Trainer(object):
         self.class_weights = None #[1, 1, 1, 1, 1.3]
         self.model_name = "FPN"
         #self.encoder = "se_resnext101_32x4d"
-        self.encoder = "efficientnet-b3"
-        ext_text = "unet"
+        self.encoder = "efficientnet-b5"
+        ext_text = "fpn"
         self.num_samples = None  # 5000
-        #date = "88"
+        date = "1910"
         self.folder = f"weights/{date}_{self.encoder}_f{self.fold}_{ext_text}"
-        self.resume = False
+        self.resume = True
         self.pretrained = False
         self.pretrained_path = "weights//ckpt31.pth"
         #self.resume_path = "weights/48_UNet_f1_ft1024/ckpt38.pth"
         self.resume_path = os.path.join(HOME, self.folder, "ckpt.pth")
         self.train_df_name = "train.csv"
         self.num_workers = 12
-        self.phases = ["train", "val"]
-        self.batch_size = {"train": 8, "val": 4}
+        #self.phases = ["train", "val"]
+        self.phases = ["val"]
+        self.batch_size = {"train": 2, "val": 1}
         self.accumulation_steps = {x: 32 // self.batch_size[x] for x in self.phases}
         self.num_classes = 4
         self.top_lr = 1e-4
         self.ep2unfreeze = 0 # doesn't matter, will look into smp
-        self.num_epochs = 40
+        self.num_epochs = 45
         # self.base_lr = self.top_lr * 0.001
         self.base_lr = None
         self.momentum = 0.95
@@ -139,9 +140,9 @@ class Trainer(object):
                 num_workers=self.num_workers,
                 num_samples=self.num_samples,
             )
-            for phase in ["train", "val"]
+            for phase in self.phases
         }
-        save_hyperparameters(self, remark)
+        #save_hyperparameters(self, remark)
 
     def load_state(self):  # [4]
         if self.resume:
@@ -184,9 +185,9 @@ class Trainer(object):
         pass
 
     def forward(self, images, targets):
-        # pdb.set_trace()
+        #pdb.set_trace()
         images = images.to(self.device)
-        masks = targets['masks'].to(self.device)
+        masks = targets['masks'].to(self.device).float()
         outputs = self.net(images)
         #loss = self.criterion(outputs.flatten(), masks.flatten())
         loss = self.criterion(outputs, masks)
@@ -237,7 +238,7 @@ class Trainer(object):
                 # self.base_lr = self.top_lr
                 # self.optimizer = adjust_lr(self.base_lr, self.optimizer)
 
-            self.iterate(epoch, "train")
+            self.iterate(epoch, "val")
             state = {
                 "epoch": epoch,
                 "best_loss": self.best_loss,
@@ -245,6 +246,7 @@ class Trainer(object):
                 "optimizer": self.optimizer.state_dict(),
             }
 
+            import pdb; pdb.set_trace()
             with torch.no_grad():
                 val_loss, best_threshold = self.iterate(epoch, "val")
                 state['best_threshold'] = best_threshold
